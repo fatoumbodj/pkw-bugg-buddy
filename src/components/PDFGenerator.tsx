@@ -1,24 +1,24 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileDown, Loader2 } from 'lucide-react';
+import { FileDown, Loader2, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Message } from './ChatBubble';
+import { CoverDesign } from './CoverDesigner';
+import { BubbleSettings } from './BubbleCustomization';
 
 interface PDFGeneratorProps {
   messages: Message[];
   participants: string[];
+  coverDesign: CoverDesign;
+  bubbleSettings: BubbleSettings;
   onGenerate?: (pdf: jsPDF) => void;
 }
 
-export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGeneratorProps) => {
+export const PDFGenerator = ({ messages, participants, coverDesign, bubbleSettings, onGenerate }: PDFGeneratorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [title, setTitle] = useState(`Souvenirs WhatsApp - ${participants.join(' & ')}`);
-  const [subtitle, setSubTitle] = useState('Livre de conversation');
 
   const generatePDF = async () => {
     if (messages.length === 0) {
@@ -35,16 +35,58 @@ export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGenerato
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 20;
 
-      // Add title page
-      pdf.setFontSize(24);
-      pdf.text(title, pageWidth / 2, 50, { align: 'center' });
+      // Add cover page with custom design
+      if (coverDesign.coverImage) {
+        try {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = coverDesign.coverImage!;
+          });
+          
+          // Add cover image as background
+          const imgAspect = img.width / img.height;
+          const pageAspect = pageWidth / pageHeight;
+          
+          let imgWidth, imgHeight, x, y;
+          
+          if (imgAspect > pageAspect) {
+            imgHeight = pageHeight;
+            imgWidth = imgHeight * imgAspect;
+            x = (pageWidth - imgWidth) / 2;
+            y = 0;
+          } else {
+            imgWidth = pageWidth;
+            imgHeight = imgWidth / imgAspect;
+            x = 0;
+            y = (pageHeight - imgHeight) / 2;
+          }
+          
+          pdf.addImage(coverDesign.coverImage, 'JPEG', x, y, imgWidth, imgHeight);
+        } catch (error) {
+          console.warn('Erreur lors du chargement de l\'image de couverture:', error);
+          // Fallback: couleur de fond uniquement
+          pdf.setFillColor(coverDesign.backgroundColor);
+          pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        }
+      } else {
+        // Background color only
+        pdf.setFillColor(coverDesign.backgroundColor);
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+      }
       
-      pdf.setFontSize(16);
-      pdf.text(subtitle, pageWidth / 2, 70, { align: 'center' });
+      // Add cover text
+      pdf.setTextColor(coverDesign.textColor);
+      pdf.setFontSize(28);
+      pdf.text(coverDesign.title, pageWidth / 2, pageHeight * 0.4, { align: 'center' });
       
-      pdf.setFontSize(12);
-      pdf.text(`${messages.length} messages`, pageWidth / 2, 90, { align: 'center' });
-      pdf.text(`${participants.join(', ')}`, pageWidth / 2, 110, { align: 'center' });
+      pdf.setFontSize(18);
+      pdf.text(coverDesign.subtitle, pageWidth / 2, pageHeight * 0.5, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.text(`${messages.length} messages`, pageWidth / 2, pageHeight * 0.6, { align: 'center' });
       
       const startDate = messages[0]?.timestamp;
       const endDate = messages[messages.length - 1]?.timestamp;
@@ -53,9 +95,51 @@ export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGenerato
         pdf.text(
           `${startDate.toLocaleDateString('fr-FR')} - ${endDate.toLocaleDateString('fr-FR')}`,
           pageWidth / 2,
-          130,
+          pageHeight * 0.65,
           { align: 'center' }
         );
+      }
+
+      // Add dedication page if provided
+      if (coverDesign.dedication?.trim()) {
+        pdf.addPage();
+        pdf.setFillColor('#FFFFFF');
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        pdf.setTextColor('#000000');
+        
+        pdf.setFontSize(20);
+        pdf.text('Dédicace', pageWidth / 2, 40, { align: 'center' });
+        
+        pdf.setFontSize(14);
+        const dedicationLines = pdf.splitTextToSize(coverDesign.dedication, pageWidth - 40);
+        pdf.text(dedicationLines, pageWidth / 2, pageHeight / 2 - 20, { align: 'center' });
+      }
+
+      // Add foreword page if provided
+      if (coverDesign.foreword?.trim()) {
+        pdf.addPage();
+        pdf.setFillColor('#FFFFFF');
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        pdf.setTextColor('#000000');
+        
+        pdf.setFontSize(20);
+        pdf.text('Avant-propos', pageWidth / 2, 40, { align: 'center' });
+        
+        pdf.setFontSize(12);
+        const forewordLines = pdf.splitTextToSize(coverDesign.foreword, pageWidth - 40);
+        pdf.text(forewordLines, margin, 70);
+      }
+
+      // Add sweet message page if provided
+      if (coverDesign.sweetMessage?.trim()) {
+        pdf.addPage();
+        pdf.setFillColor('#FFFFFF');
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+        pdf.setTextColor('#000000');
+        
+        pdf.setFontSize(16);
+        const messageLines = pdf.splitTextToSize(coverDesign.sweetMessage, pageWidth - 60);
+        pdf.text(messageLines, pageWidth / 2, pageHeight / 2, { align: 'center' });
       }
 
       // Capture chat content
@@ -109,7 +193,7 @@ export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGenerato
       }
 
       // Save the PDF
-      pdf.save(`${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+      pdf.save(`${coverDesign.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
       
       toast.success('PDF généré avec succès !');
       
@@ -129,40 +213,24 @@ export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGenerato
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileDown className="h-5 w-5" />
-          Générer le PDF Souvenir
+          <BookOpen className="h-5 w-5" />
+          Générer le livre PDF
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <Label htmlFor="title">Titre du livre</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Titre de votre livre souvenir"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="subtitle">Sous-titre</Label>
-            <Input
-              id="subtitle"
-              value={subtitle}
-              onChange={(e) => setSubTitle(e.target.value)}
-              placeholder="Sous-titre (optionnel)"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="text-sm text-muted-foreground">
-            <p>• {messages.length} messages à inclure</p>
-            <p>• Participants: {participants.join(', ')}</p>
+        <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+          <h4 className="font-medium">Aperçu du livre</h4>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>📖 Titre: {coverDesign.title}</p>
+            <p>👥 Participants: {participants.join(', ')}</p>
+            <p>💬 {messages.length} messages</p>
             {messages.length > 0 && (
-              <p>• Période: {messages[0].timestamp.toLocaleDateString('fr-FR')} - {messages[messages.length - 1].timestamp.toLocaleDateString('fr-FR')}</p>
+              <p>📅 {messages[0].timestamp.toLocaleDateString('fr-FR')} - {messages[messages.length - 1].timestamp.toLocaleDateString('fr-FR')}</p>
             )}
+            {coverDesign.dedication && <p>💝 Avec dédicace</p>}
+            {coverDesign.foreword && <p>📝 Avec avant-propos</p>}
+            {coverDesign.sweetMessage && <p>💕 Avec message doux</p>}
+            {coverDesign.coverImage && <p>🖼️ Avec image de couverture</p>}
           </div>
         </div>
 
@@ -175,15 +243,21 @@ export const PDFGenerator = ({ messages, participants, onGenerate }: PDFGenerato
           {isGenerating ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Génération en cours...
+              Création du livre en cours...
             </>
           ) : (
             <>
-              <FileDown className="h-4 w-4 mr-2" />
-              Générer le PDF
+              <BookOpen className="h-4 w-4 mr-2" />
+              Créer le livre PDF
             </>
           )}
         </Button>
+        
+        {messages.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center">
+            Veuillez d'abord importer une conversation WhatsApp
+          </p>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,15 +1,36 @@
 import { useState } from 'react';
 import { FileUpload } from '@/components/FileUpload';
-import { ChatPreview } from '@/components/ChatPreview';
+import { EnhancedChatPreview } from '@/components/EnhancedChatPreview';
 import { PDFGenerator } from '@/components/PDFGenerator';
+import { CoverDesigner, CoverDesign } from '@/components/CoverDesigner';
+import { BubbleCustomization, BubbleSettings } from '@/components/BubbleCustomization';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { WhatsAppParser, ParsedConversation } from '@/utils/whatsappParser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, BookOpen, Upload } from 'lucide-react';
+import { MessageSquare, BookOpen, Upload, Palette, Settings } from 'lucide-react';
 
 const Index = () => {
   const [conversation, setConversation] = useState<ParsedConversation | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  const [coverDesign, setCoverDesign] = useState<CoverDesign>({
+    title: 'Nos Souvenirs WhatsApp',
+    subtitle: 'Livre de conversations',
+    backgroundColor: '#1E40AF',
+    textColor: '#FFFFFF'
+  });
+  
+  const [bubbleSettings, setBubbleSettings] = useState<BubbleSettings>({
+    myBubbleColor: '#3B82F6',
+    otherBubbleColor: '#F3F4F6',
+    myTextColor: '#FFFFFF',
+    otherTextColor: '#000000',
+    showTimestamps: true,
+    showSenderNames: true,
+    bubbleOpacity: 1,
+    borderRadius: 12
+  });
 
   const handleFileSelect = async (file: File) => {
     setIsProcessing(true);
@@ -20,6 +41,13 @@ const Index = () => {
       const parsed = await parser.parseZipFile(file);
       
       setConversation(parsed);
+      
+      // Update cover design with participants
+      setCoverDesign(prev => ({
+        ...prev,
+        subtitle: `${parsed.participants.join(' & ')} - Livre de conversations`
+      }));
+      
       toast.success(`${parsed.messages.length} messages chargés avec succès !`);
       
     } catch (error) {
@@ -93,33 +121,84 @@ const Index = () => {
             </Card>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <ChatPreview 
-                messages={conversation.messages}
-                participants={conversation.participants}
-              />
-            </div>
-            
-            <div className="space-y-4">
-              <PDFGenerator 
-                messages={conversation.messages}
-                participants={conversation.participants}
-              />
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="text-center space-y-2">
-                    <button
-                      onClick={() => setConversation(null)}
-                      className="text-sm text-muted-foreground hover:text-foreground underline"
-                    >
-                      Charger une autre conversation
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="space-y-6">
+            <Tabs defaultValue="preview" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="preview" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Aperçu
+                </TabsTrigger>
+                <TabsTrigger value="cover" className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Couverture
+                </TabsTrigger>
+                <TabsTrigger value="bubbles" className="flex items-center gap-2">
+                  <Palette className="h-4 w-4" />
+                  Bulles
+                </TabsTrigger>
+                <TabsTrigger value="generate" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Génération
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="preview" className="mt-6">
+                <EnhancedChatPreview 
+                  messages={conversation.messages}
+                  participants={conversation.participants}
+                  bubbleSettings={bubbleSettings}
+                />
+              </TabsContent>
+
+              <TabsContent value="cover" className="mt-6">
+                <CoverDesigner
+                  design={coverDesign}
+                  onChange={setCoverDesign}
+                  participants={conversation.participants}
+                />
+              </TabsContent>
+
+              <TabsContent value="bubbles" className="mt-6">
+                <BubbleCustomization
+                  settings={bubbleSettings}
+                  onChange={setBubbleSettings}
+                  participants={conversation.participants}
+                />
+              </TabsContent>
+
+              <TabsContent value="generate" className="mt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <PDFGenerator 
+                    messages={conversation.messages}
+                    participants={conversation.participants}
+                    coverDesign={coverDesign}
+                    bubbleSettings={bubbleSettings}
+                  />
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <button
+                        onClick={() => setConversation(null)}
+                        className="w-full text-sm text-muted-foreground hover:text-foreground underline p-2 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        📁 Charger une autre conversation
+                      </button>
+                      
+                      <div className="text-xs text-muted-foreground space-y-1 bg-muted/30 p-3 rounded">
+                        <p>💡 <strong>Conseils:</strong></p>
+                        <p>• Personnalisez la couverture dans l'onglet "Couverture"</p>
+                        <p>• Ajustez les couleurs des bulles dans "Bulles"</p>
+                        <p>• Prévisualisez le résultat dans "Aperçu"</p>
+                        <p>• Générez votre livre dans cet onglet</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </div>
