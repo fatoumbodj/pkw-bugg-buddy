@@ -1,207 +1,172 @@
-import { useState } from 'react';
-import { FileUpload } from '@/components/FileUpload';
-import { EnhancedChatPreview } from '@/components/EnhancedChatPreview';
-import { PDFGenerator } from '@/components/PDFGenerator';
-import { CoverDesigner, CoverDesign } from '@/components/CoverDesigner';
-import { BubbleCustomization, BubbleSettings } from '@/components/BubbleCustomization';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
-import { WhatsAppParser, ParsedConversation } from '@/utils/whatsappParser';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, BookOpen, Upload, Palette, Settings } from 'lucide-react';
+
+import Hero from '@/components/Hero';
+import Features from '@/components/Features';
+import QRCodeShowcase from '@/components/QRCodeShowcase';
+import { Button } from '@/components/ui/button';
+import { BookOpen, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Grid } from '@/components/ui/grid';
+import { Slider } from '@/components/ui/slider';
+import { useState, useEffect } from 'react';
+import CreateBookSection from '@/components/CreateBookSection';
+
 
 const Index = () => {
-  const [conversation, setConversation] = useState<ParsedConversation | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
   
-  const [coverDesign, setCoverDesign] = useState<CoverDesign>({
-    title: 'Nos Souvenirs WhatsApp',
-    subtitle: 'Livre de conversations',
-    backgroundColor: '#1E40AF',
-    textColor: '#FFFFFF'
-  });
-  
-  const [bubbleSettings, setBubbleSettings] = useState<BubbleSettings>({
-    myBubbleColor: '#3B82F6',
-    otherBubbleColor: '#F3F4F6',
-    myTextColor: '#FFFFFF',
-    otherTextColor: '#000000',
-    showTimestamps: true,
-    showSenderNames: true,
-    bubbleOpacity: 1,
-    borderRadius: 12
-  });
-
-  const handleFileSelect = async (file: File) => {
-    setIsProcessing(true);
-    toast.info('Traitement du fichier en cours...');
-
-    try {
-      const parser = new WhatsAppParser();
-      const parsed = await parser.parseZipFile(file);
-      
-      setConversation(parsed);
-      
-      // Update cover design with participants
-      setCoverDesign(prev => ({
-        ...prev,
-        subtitle: `${parsed.participants.join(' & ')} - Livre de conversations`
-      }));
-      
-      toast.success(`${parsed.messages.length} messages chargés avec succès !`);
-      
-    } catch (error) {
-      console.error('Erreur lors du traitement:', error);
-      toast.error('Erreur lors du traitement du fichier WhatsApp');
-    } finally {
-      setIsProcessing(false);
+  const handleCreateBookClick = () => {
+    if (isAuthenticated) {
+      navigate('/designer');
+    } else {
+      navigate('/login', { state: { redirectAfterLogin: '/designer' } });
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">WhatsApp to PDF</h1>
-          </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Transformez vos conversations WhatsApp en magnifique livre PDF souvenir 
-            avec des bulles de messages et des images
-          </p>
-        </div>
+  const handleViewProcessClick = () => {
+    navigate('/process');
+  };
 
-        {!conversation ? (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Upload className="h-5 w-5" />
-                  Étape 1: Importez votre export WhatsApp
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FileUpload onFileSelect={handleFileSelect} />
-                {isProcessing && (
-                  <div className="mt-4 text-center">
-                    <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                      Analyse du fichier ZIP en cours...
+  // Sample book covers for the carousel
+  const bookCovers = [
+    { src: "/covers/book-cover-1.png", alt: "Exemple de livre souvenir" },
+    { src: "/covers/book-cover-2.png", alt: "Livre de conversations" },
+    { src: "/covers/book-cover-3.png", alt: "Souvenirs WhatsApp" },
+    { src: "/covers/book-cover-4.png", alt: "Album de messages" },
+  ];
+
+  // Autoplay functionality for carousel - fixed to use window.setInterval
+  useEffect(() => {
+    let intervalId: number | undefined;
+    
+    if (autoPlay) {
+      intervalId = window.setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % bookCovers.length);
+      }, 3000);
+    }
+    
+    return () => {
+      if (intervalId !== undefined) {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, [autoPlay, bookCovers.length]);
+
+  return (
+    <div>
+      <main>
+        <Hero />
+           {/* QR Code Showcase - New section added between Hero and Features */}
+        <QRCodeShowcase />
+         {/* Section Créer mon livre - Nouvelle interface */}
+        <CreateBookSection />
+        
+        <Features />
+        
+        {/* Middle CTA */}
+        <section className="py-20 bg-ts-gold/10">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col lg:flex-row items-center gap-12">
+              
+              {/* Carousel des couvertures */}
+              <div className="w-full lg:w-1/2">
+                <div className="max-w-md mx-auto relative">
+                  <div className="overflow-hidden rounded-lg shadow-xl">
+                    <Carousel className="w-full" setApi={(api) => api?.scrollTo(currentSlide)}>
+                      <CarouselContent>
+                        {bookCovers.map((book, index) => (
+                          <CarouselItem key={index}>
+                            <div className="p-1 mt-10">
+                              <div className="overflow-hidden rounded-lg shadow-lg">
+                                <AspectRatio ratio={3 / 4} className="bg-white">
+                                  <img
+                                    src={book.src}
+                                    alt={book.alt}
+                                    className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                                  />
+                                </AspectRatio>
+                              </div>
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <div className="flex justify-center mt-4">
+                        <CarouselPrevious />
+                        <CarouselNext />
+                      </div>
+                    </Carousel>
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <div className="w-3/4">
+                      <Slider
+                        value={[currentSlide]}
+                        min={0}
+                        max={bookCovers.length - 1}
+                        step={1}
+                        onValueChange={(value) => setCurrentSlide(value[0])}
+                        className="my-4"
+                      />
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Comment exporter vos conversations WhatsApp
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p><strong>Sur Android:</strong></p>
-                <ol className="list-decimal list-inside space-y-1 ml-4">
-                  <li>Ouvrez la conversation WhatsApp</li>
-                  <li>Appuyez sur les 3 points → Plus → Exporter la discussion</li>
-                  <li>Choisissez "Inclure les médias"</li>
-                  <li>Sélectionnez "Enregistrer dans les fichiers"</li>
-                </ol>
-                
-                <p className="mt-4"><strong>Sur iPhone:</strong></p>
-                <ol className="list-decimal list-inside space-y-1 ml-4">
-                  <li>Ouvrez la conversation WhatsApp</li>
-                  <li>Appuyez sur le nom du contact → Exporter la discussion</li>
-                  <li>Choisissez "Joindre les médias"</li>
-                  <li>Sélectionnez "Enregistrer dans Fichiers"</li>
-                </ol>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <Tabs defaultValue="preview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="preview" className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Aperçu
-                </TabsTrigger>
-                <TabsTrigger value="cover" className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Couverture
-                </TabsTrigger>
-                <TabsTrigger value="bubbles" className="flex items-center gap-2">
-                  <Palette className="h-4 w-4" />
-                  Bulles
-                </TabsTrigger>
-                <TabsTrigger value="generate" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Génération
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="preview" className="mt-6">
-                <EnhancedChatPreview 
-                  messages={conversation.messages}
-                  participants={conversation.participants}
-                  bubbleSettings={bubbleSettings}
-                />
-              </TabsContent>
-
-              <TabsContent value="cover" className="mt-6">
-                <CoverDesigner
-                  design={coverDesign}
-                  onChange={setCoverDesign}
-                  participants={conversation.participants}
-                />
-              </TabsContent>
-
-              <TabsContent value="bubbles" className="mt-6">
-                <BubbleCustomization
-                  settings={bubbleSettings}
-                  onChange={setBubbleSettings}
-                  participants={conversation.participants}
-                />
-              </TabsContent>
-
-              <TabsContent value="generate" className="mt-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <PDFGenerator 
-                    messages={conversation.messages}
-                    participants={conversation.participants}
-                    coverDesign={coverDesign}
-                    bubbleSettings={bubbleSettings}
-                  />
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <button
-                        onClick={() => setConversation(null)}
-                        className="w-full text-sm text-muted-foreground hover:text-foreground underline p-2 border rounded-lg hover:bg-muted/50 transition-colors"
+                  <Grid cols={4} className="gap-2 mt-2 max-w-sm mx-auto">
+                    {bookCovers.map((book, index) => (
+                      <div
+                        key={index}
+                        className={`cursor-pointer rounded-md overflow-hidden border-2 ${currentSlide === index ? 'border-ts-gold' : 'border-transparent'}`}
+                        onClick={() => setCurrentSlide(index)}
                       >
-                        📁 Charger une autre conversation
-                      </button>
-                      
-                      <div className="text-xs text-muted-foreground space-y-1 bg-muted/30 p-3 rounded">
-                        <p>💡 <strong>Conseils:</strong></p>
-                        <p>• Personnalisez la couverture dans l'onglet "Couverture"</p>
-                        <p>• Ajustez les couleurs des bulles dans "Bulles"</p>
-                        <p>• Prévisualisez le résultat dans "Aperçu"</p>
-                        <p>• Générez votre livre dans cet onglet</p>
+                        <AspectRatio ratio={3 / 4}>
+                          <img
+                            src={book.src}
+                            alt={`Miniature ${index + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                        </AspectRatio>
                       </div>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </Grid>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+
+              {/* Texte + boutons */}
+              <div className="w-full lg:w-1/2 text-center lg:text-left">
+                <h2 className="text-3xl md:text-4xl font-serif font-semibold text-ts-indigo mb-6">
+                  Transformez vos souvenirs en un vrai livre 📖
+                </h2>
+                <p className="text-gray-700 mb-8 text-lg">
+                  En quelques clics, créez un livre personnalisé à partir de vos messages. Le cadeau idéal pour vos proches — ou pour vous-même.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Button 
+                    className="btn-primary text-lg px-8 py-6 flex items-center gap-2"
+                    onClick={handleCreateBookClick}
+                  >
+                    <BookOpen className="h-5 w-5" />
+                    Créer mon livre
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-ts-indigo text-ts-indigo hover:bg-ts-indigo/10 flex items-center gap-2"
+                    onClick={handleViewProcessClick}
+                  >
+                    Voir comment ça marche
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+        </section>
+      </main>
     </div>
   );
 };
