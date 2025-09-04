@@ -3,14 +3,14 @@ import React from 'react';
 import HowItWorks from '@/components/HowItWorks';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 import { BookOpen } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const ProcessPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useBackendAuth();
   
   const handleCreateBookClick = () => {
     if (isAuthenticated) {

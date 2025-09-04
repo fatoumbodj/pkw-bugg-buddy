@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
 import { BackendAuthProvider } from "@/context/BackendAuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -57,15 +56,14 @@ import InstagramBookInterface from "./components/InstagramBookInterface";
 import FacebookBookInterface from "./components/FacebookInterface";
 import WhatsAppBookInterface from "./components/WhatsAppBookInterface";
 import ChatBookCreator from "./pages/ChatBookCreator";
-import BackendTestPayment from "./pages/BackendTestPayment";
+import WhatsAppBookCreation from './pages/WhatsAppBookCreation';
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <AuthProvider>
-        <BackendAuthProvider>
+      <BackendAuthProvider>
           <CartProvider>
           <TooltipProvider>
           <Toaster />
@@ -100,7 +98,7 @@ const App = () => (
                 <Route path="/extractor" element={<ExtractorTool />} />
                 <Route path="/mock-orders" element={<MockOrders />} />
                 <Route path="/chat-book" element={<ChatBookCreator />} />
-                <Route path="/test-backend-payment" element={<BackendTestPayment />} />
+                <Route path="/whatsapp-book" element={<WhatsAppBookCreation />} />
 
                 {/* Routes temporairement publiques - authentification désactivée */}
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -133,8 +131,7 @@ const App = () => (
           </BrowserRouter>
          </TooltipProvider>
        </CartProvider>
-     </BackendAuthProvider>
-    </AuthProvider>
+      </BackendAuthProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );

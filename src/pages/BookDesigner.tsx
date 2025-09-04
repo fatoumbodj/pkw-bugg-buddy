@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 import { ArrowRight, ArrowLeft, BookOpen, Heart, Star, Sparkles } from 'lucide-react';
 import { FaWhatsapp, FaFacebookMessenger, FaInstagram } from 'react-icons/fa';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +11,7 @@ import FacebookBookInterface from '@/components/FacebookInterface';
 import WhatsAppBookInterface from '@/components/WhatsAppBookInterface';
 const BookDesigner = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user } = useBackendAuth();
   const [currentView, setCurrentView] = useState<'platforms' | 'instagram' | 'facebook'| 'whatsApp'>('platforms');
   
   // Redirect if the user is not authenticated - Temporairement désactivé pour les tests

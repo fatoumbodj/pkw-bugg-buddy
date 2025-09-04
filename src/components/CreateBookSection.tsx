@@ -5,13 +5,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { FaWhatsapp, FaFacebookMessenger, FaInstagram } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 
 
 
 const CreateBookSection = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useBackendAuth();
 
   const handlePlatformSelect = (platform: string) => {
     // Temporairement sans vérification d'authentification

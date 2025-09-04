@@ -1,6 +1,6 @@
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useBackendAuth } from "@/context/BackendAuthContext";
 import { Loader2 } from "lucide-react";
 
 interface AdminRouteProps {
@@ -8,7 +8,7 @@ interface AdminRouteProps {
 }
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { isAuthenticated, isAdmin, isLoading } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading } = useBackendAuth();
 
   // Afficher un loader pendant la vérification
   if (isLoading) {

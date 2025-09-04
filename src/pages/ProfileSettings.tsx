@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useBackendAuth } from "@/context/BackendAuthContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 
 const ProfileSettings = () => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useBackendAuth();
   const { t } = useLanguage();
   const { toast } = useToast();
   

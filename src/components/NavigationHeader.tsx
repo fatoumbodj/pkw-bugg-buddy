@@ -1,12 +1,12 @@
 
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 import { LogOut, User } from 'lucide-react';
 
 export const NavigationHeader = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useBackendAuth();
 
   const handleLogout = () => {
     logout();

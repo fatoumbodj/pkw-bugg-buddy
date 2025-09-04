@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, ShoppingCart } from 'lucide-react';
-import { productService } from '@/lib/supabaseServices';
+import { productService } from '@/lib/backendServices';
 import ProductCard from '@/components/ProductCard';
 import { useToast } from '@/hooks/use-toast';
 

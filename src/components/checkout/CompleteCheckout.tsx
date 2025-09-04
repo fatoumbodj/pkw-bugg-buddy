@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, CreditCard, Smartphone } from 'lucide-react';
-import { orderService, paymentService, formatPrice } from '@/lib/supabaseServices';
+import { orderService, paymentService, formatPrice } from '@/lib/backendServices';
 import { useNavigate } from 'react-router-dom';
 
 interface ShippingAddress {
@@ -23,7 +23,7 @@ interface ShippingAddress {
 
 const CompleteCheckout = () => {
   const { items, total, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user } = useBackendAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 

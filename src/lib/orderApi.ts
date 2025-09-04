@@ -1,5 +1,5 @@
 
-import { orderService } from './supabaseServices';
+import { orderService } from './backendServices';
 
 // API pour les commandes utilisant Supabase
 export const orderApi = {

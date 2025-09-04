@@ -2,12 +2,12 @@
 import { CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useBackendAuth } from '@/context/BackendAuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 const Features = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useBackendAuth();
   const { language } = useLanguage();
   
   const handleCreateBookClick = () => {
