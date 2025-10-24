@@ -1,6 +1,7 @@
-// Configuration centrale de l'API Backend Spring Boot
+// Configuration API - Backend Node.js sur port 3000
 export const API_CONFIG = {
-  BASE_URL: "http://localhost:8080/api",
+  BASE_URL: "http://localhost:3000/api",
+  ADMIN_BASE_URL: "http://localhost:3000/api/admin",
   TIMEOUT: 30000,
 };
 

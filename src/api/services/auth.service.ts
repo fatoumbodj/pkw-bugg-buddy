@@ -33,19 +33,42 @@ class AuthService {
   // Connexion
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', credentials, false);
+      // Utiliser l'endpoint admin si c'est un email admin
+      const isAdmin = credentials.email.includes('admin');
+      const endpoint = isAdmin ? '/admin/auth/login' : '/auth/login';
       
-      if (response.success && response.token) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
+      const response = await fetch(`http://localhost:3000${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur de connexion');
+      }
+
+      const data = await response.json();
+      
+      // Adapter la réponse du backend Node.js
+      const authResponse: AuthResponse = {
+        success: true,
+        token: data.data?.token || data.token,
+        user: data.data?.admin || data.data?.user || data.user,
+        message: data.message || 'Connexion réussie'
+      };
+      
+      if (authResponse.token) {
+        localStorage.setItem('token', authResponse.token);
+        localStorage.setItem('user', JSON.stringify(authResponse.user));
         
         toast({
           title: "Connexion réussie",
-          description: `Bienvenue ${response.user.firstName}!`,
+          description: `Bienvenue ${authResponse.user.firstName || authResponse.user.email}!`,
         });
       }
       
-      return response;
+      return authResponse;
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

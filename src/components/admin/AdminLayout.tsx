@@ -11,7 +11,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AdminSidebar from "./AdminSidebar";
 import { useState, useEffect } from "react";

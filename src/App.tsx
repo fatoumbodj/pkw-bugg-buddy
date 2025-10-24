@@ -31,7 +31,7 @@ import AdminBooks from "./pages/admin/AdminBooks";
 import AdminContent from "./pages/admin/AdminContent";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminPartners from "./pages/admin/AdminPartners";
-import AdminAccounts from "./pages/admin/AdminAccounts";
+// AdminAccounts removed
 import AdminHistory from "./pages/admin/AdminHistory";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminLayout from "./components/admin/AdminLayout";
