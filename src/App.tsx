@@ -4,8 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/context/AuthContext";
-import { BackendAuthProvider } from "@/context/BackendAuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import Index from "./pages/Index";
@@ -57,7 +56,7 @@ import InstagramBookInterface from "./components/InstagramBookInterface";
 import FacebookBookInterface from "./components/FacebookInterface";
 import WhatsAppBookInterface from "./components/WhatsAppBookInterface";
 import ChatBookCreator from "./pages/ChatBookCreator";
-import BackendTestPayment from "./pages/BackendTestPayment";
+// Backend test payment removed
 
 const queryClient = new QueryClient();
 
@@ -65,7 +64,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <AuthProvider>
-        <BackendAuthProvider>
+        <AuthProvider>
           <CartProvider>
           <TooltipProvider>
           <Toaster />
@@ -133,7 +132,7 @@ const App = () => (
           </BrowserRouter>
          </TooltipProvider>
        </CartProvider>
-     </BackendAuthProvider>
+     </AuthProvider>
     </AuthProvider>
     </LanguageProvider>
   </QueryClientProvider>

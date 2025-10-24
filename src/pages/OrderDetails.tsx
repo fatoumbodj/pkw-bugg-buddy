@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { orderApi } from "@/lib/orderApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { orderService } from "@/api/services/order.service";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

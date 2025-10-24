@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, CreditCard, Smartphone, Phone } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useBackendAuth } from '@/context/BackendAuthContext';
-import { backendPaymentService } from '@/lib/backendPaymentApi';
+import { useAuth } from '@/contexts/AuthContext';
+import { paymentService } from '@/api/services/payment.service';
 import { toast } from '@/hooks/use-toast';
 import MobileMoneyForm from './MobileMoneyForm';
 import CreditCardForm from './CreditCardForm';
@@ -18,7 +18,7 @@ interface BackendPaymentFormProps {
 
 const BackendPaymentForm: React.FC<BackendPaymentFormProps> = ({ onSuccess, onError }) => {
   const { items, total, clearCart } = useCart();
-  const { user, isAuthenticated } = useBackendAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState("mobile_money");
 

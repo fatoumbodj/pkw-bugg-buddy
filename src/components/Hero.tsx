@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { BookOpen } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 

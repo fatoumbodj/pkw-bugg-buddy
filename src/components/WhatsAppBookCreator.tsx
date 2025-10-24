@@ -3,8 +3,8 @@ import { Upload, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { bookService } from '@/api/services/book.service';
 import { useToast } from '@/hooks/use-toast';
 
 export default function WhatsAppBookCreator() {

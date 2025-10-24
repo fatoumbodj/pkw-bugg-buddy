@@ -20,7 +20,7 @@ const AdminOrders: React.FC = () => {
 
   const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ['admin-orders', getFilteredQuery()],
-    queryFn: () => orderApi.getAllOrders('admin-token', getFilteredQuery()),
+    queryFn: () => orderService.getAllOrders(),
   });
 
   const handleExportOrders = () => {

@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { LogOut, User } from 'lucide-react';
 
 export const NavigationHeader = () => {
