@@ -42,7 +42,7 @@ const AdminDashboard = () => {
       });
 
       // Charger les commandes récentes
-      const ordersData = await adminService.getAllOrders();
+      const ordersData = await orderService.getAllOrders();
       setRecentOrders(ordersData.slice(0, 5)); // Les 5 dernières commandes
 
     } catch (error: any) {

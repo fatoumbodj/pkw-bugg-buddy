@@ -22,33 +22,34 @@ export default function WhatsAppBookCreator() {
     setProgress(0);
 
     try {
-      // Upload file to Supabase Storage
-      const fileName = `${user.id}/${Date.now()}_${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('user-uploads')
-        .upload(fileName, file);
+      setProgress(20);
 
-      if (uploadError) throw uploadError;
+      // Upload file au backend Spring Boot
+      const uploadResult = await bookService.uploadWhatsAppFile(file);
+      
+      setProgress(50);
 
-      // Call processing function
-      const { data, error } = await supabase.functions.invoke('process-whatsapp-zip', {
-        body: {
-          zipFile: uploadData.path,
-          title: 'Mon livre WhatsApp',
-          userId: user.id
-        }
-      });
+      // Créer le livre avec les données extraites
+      const bookData = {
+        title: 'Mon livre WhatsApp',
+        coverStyle: 'modern',
+        coverColor: '#8B5CF6',
+        messages: uploadResult.messages,
+        fileUrl: uploadResult.fileUrl,
+        userId: user.id
+      };
 
-      if (error) throw error;
+      const book = await bookService.createBook(bookData);
+      setBookId(book.id);
+      
+      setProgress(100);
 
-      setBookId(data.bookId);
       toast({
         title: "Livre créé avec succès!",
-        description: "Votre livre WhatsApp est prêt à être téléchargé.",
+        description: "Votre livre WhatsApp est prêt",
       });
-
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error('Error processing file:', error);
       toast({
         title: "Erreur",
         description: error.message || "Impossible de traiter le fichier",

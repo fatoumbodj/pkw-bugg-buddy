@@ -16,8 +16,8 @@ const ProfileSettings = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   
-  const [firstName, setFirstName] = useState(user?.user_metadata?.first_name || "");
-  const [lastName, setLastName] = useState(user?.user_metadata?.last_name || "");
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [lastName, setLastName] = useState(user?.lastName || "");
   const [email, setEmail] = useState(user?.email || "");
   
   const [currentPassword, setCurrentPassword] = useState("");

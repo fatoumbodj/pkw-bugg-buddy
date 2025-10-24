@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-// import { orderApi } from '@/lib/orderApi';
+import { orderService } from '@/api/services/order.service';
 import { AdminOrderFilters } from '@/components/admin/orders/AdminOrderFilters';
 import { AdminOrdersList } from '@/components/admin/orders/AdminOrdersList';
 import { AdminOrderStats } from '@/components/admin/orders/AdminOrderStats';

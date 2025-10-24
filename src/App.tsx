@@ -99,7 +99,7 @@ const App = () => (
                 <Route path="/extractor" element={<ExtractorTool />} />
                 <Route path="/mock-orders" element={<MockOrders />} />
                 <Route path="/chat-book" element={<ChatBookCreator />} />
-                <Route path="/test-backend-payment" element={<BackendTestPayment />} />
+                {/* Test routes removed */}
 
                 {/* Routes temporairement publiques - authentification désactivée */}
                 <Route path="/dashboard" element={<Dashboard />} />
