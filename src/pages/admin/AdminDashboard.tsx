@@ -32,18 +32,18 @@ const AdminDashboard = () => {
     try {
       setIsLoading(true);
       
-      // Charger les statistiques
-      const statsData = await adminService.getDashboardStats();
-      setStats({
-        total_orders: statsData.totalOrders,
-        pending_orders: statsData.pendingOrders,
-        completed_orders: statsData.completedOrders,
-        total_revenue: statsData.totalRevenue
-      });
-
-      // Charger les commandes récentes
+      // Charger les commandes et calculer les stats
       const ordersData = await orderService.getAllOrders();
-      setRecentOrders(ordersData.slice(0, 5)); // Les 5 dernières commandes
+      
+      const calculatedStats = {
+        total_orders: ordersData.length,
+        pending_orders: ordersData.filter(o => o.status === 'pending').length,
+        completed_orders: ordersData.filter(o => o.status === 'delivered').length,
+        total_revenue: ordersData.reduce((sum, o) => sum + o.totalAmount, 0)
+      };
+      
+      setStats(calculatedStats);
+      setRecentOrders(ordersData.slice(0, 5));
 
     } catch (error: any) {
       console.error('Error loading dashboard data:', error);

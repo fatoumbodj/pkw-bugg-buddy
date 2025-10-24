@@ -120,7 +120,7 @@ const App = () => (
                 <Route path="content" element={<AdminContent />} />
                 <Route path="messages" element={<AdminMessages />} />
                 <Route path="partners" element={<AdminPartners />} />
-                <Route path="admin-accounts" element={<AdminAccounts />} />
+                {/* Admin accounts removed - page deleted */}
                 <Route path="history" element={<AdminHistory />} />
                 <Route path="notifications" element={<AdminNotifications />} />
                 <Route path="testimonials" element={<AdminContent />} />

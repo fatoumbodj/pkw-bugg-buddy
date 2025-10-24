@@ -41,10 +41,12 @@ export default function Auth() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(registerData.email, registerData.password, { 
-        firstName: registerData.firstName, 
-        lastName: registerData.lastName 
-      });
+      await register(
+        registerData.email,
+        registerData.password,
+        registerData.firstName,
+        registerData.lastName
+      );
       navigate('/');
     } catch (error) {
       // Error is handled in AuthContext

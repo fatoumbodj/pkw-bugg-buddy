@@ -10,6 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Loader2, CreditCard, Smartphone } from 'lucide-react';
 import { orderService } from '@/api/services/order.service';
 import { paymentService } from '@/api/services/payment.service';
+import { formatPrice } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 interface ShippingAddress {
