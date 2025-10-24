@@ -1,5 +1,5 @@
-// Service de paiement Backend Java
-import { apiClient, handleApiError } from './backendApi';
+// Service de paiement Backend Spring Boot
+import { apiClient } from '../config/api-config';
 import { toast } from '@/hooks/use-toast';
 
 export interface PaymentRequest {
@@ -19,7 +19,7 @@ export interface PaymentRequest {
 export interface PaymentResponse {
   success: boolean;
   transactionId: string;
-  status: string;
+  status: 'pending' | 'success' | 'failed';
   message: string;
   payment_url?: string;
 }
@@ -31,26 +31,18 @@ export interface Transaction {
   paymentMethod: string;
   provider?: string;
   status: 'PENDING' | 'SUCCESS' | 'FAILED';
-  user: {
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
-  order: {
-    id: string;
-  };
+  orderId: string;
+  userId: string;
   createdAt: string;
   completedAt?: string;
   failureReason?: string;
 }
 
-class BackendPaymentService {
+class PaymentService {
   // Initier un paiement
   async initiatePayment(paymentData: PaymentRequest): Promise<PaymentResponse> {
     try {
-      console.log('Initiating payment:', paymentData);
-      
-      const response = await apiClient.post('/payments/initiate', paymentData);
+      const response = await apiClient.post<PaymentResponse>('/payments/initiate', paymentData);
       
       if (response.success) {
         toast({
@@ -58,7 +50,7 @@ class BackendPaymentService {
           description: "Redirection vers le portail de paiement...",
         });
         
-        // Si URL de paiement fournie, rediriger
+        // Redirection si URL fournie
         if (response.payment_url) {
           window.open(response.payment_url, '_blank');
         }
@@ -66,7 +58,6 @@ class BackendPaymentService {
       
       return response;
     } catch (error: any) {
-      console.error('Payment initiation error:', error);
       toast({
         title: "Erreur de paiement",
         description: error.message || "Impossible d'initier le paiement",
@@ -79,21 +70,18 @@ class BackendPaymentService {
   // Vérifier le statut d'un paiement
   async checkPaymentStatus(transactionId: string): Promise<PaymentResponse> {
     try {
-      const response = await apiClient.get(`/payments/status/${transactionId}`);
-      return response;
+      return await apiClient.get<PaymentResponse>(`/payments/status/${transactionId}`);
     } catch (error: any) {
       console.error('Payment status check error:', error);
       throw error;
     }
   }
 
-  // Obtenir l'historique des paiements
+  // Historique des paiements
   async getPaymentHistory(): Promise<Transaction[]> {
     try {
-      const response = await apiClient.get('/payments/history');
-      return response;
+      return await apiClient.get<Transaction[]>('/payments/history');
     } catch (error: any) {
-      console.error('Payment history error:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger l'historique",
@@ -103,17 +91,49 @@ class BackendPaymentService {
     }
   }
 
-  // Simuler un callback mobile money (pour tests)
+  // Orange Money
+  async initiateOrangeMoneyPayment(
+    phoneNumber: string,
+    amount: number,
+    orderId: string
+  ): Promise<PaymentResponse> {
+    try {
+      const response = await apiClient.post<PaymentResponse>('/payments/orange-money/initiate', {
+        phoneNumber,
+        amount,
+        orderId
+      });
+      
+      if (response.payment_url) {
+        window.open(response.payment_url, '_blank');
+      }
+      
+      return response;
+    } catch (error: any) {
+      toast({
+        title: "Erreur Orange Money",
+        description: error.message || "Impossible d'initier le paiement",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  }
+
+  // Simuler un callback (pour tests)
   async simulateMobileMoneyCallback(
-    transactionId: string, 
+    transactionId: string,
     status: "SUCCESS" | "FAILED" | "PENDING"
   ): Promise<PaymentResponse> {
     try {
-      const response = await apiClient.post('/payments/callback', {
-        transactionId,
-        status,
-        externalReference: `EXT-${Date.now()}`
-      }, false);
+      const response = await apiClient.post<PaymentResponse>(
+        '/payments/callback',
+        {
+          transactionId,
+          status,
+          externalReference: `EXT-${Date.now()}`
+        },
+        false
+      );
       
       toast({
         title: "Callback simulé",
@@ -126,44 +146,6 @@ class BackendPaymentService {
       throw error;
     }
   }
-
-  // Orange Money spécifique
-  async initiateOrangeMoneyPayment(phoneNumber: string, amount: number, orderId: string): Promise<PaymentResponse> {
-    try {
-      const response = await apiClient.post('/payments/orange-money/initiate', {
-        phoneNumber,
-        amount,
-        orderId
-      });
-      
-      if (response.payment_url) {
-        window.open(response.payment_url, '_blank');
-      }
-      
-      return response;
-    } catch (error: any) {
-      console.error('Orange Money payment error:', error);
-      throw error;
-    }
-  }
-
-  // Créer une commande temporaire pour les tests
-  async createTestOrder(items: any[]): Promise<{ orderId: string }> {
-    try {
-      const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
-      const response = await apiClient.post('/orders', {
-        items,
-        total,
-        status: 'PENDING'
-      });
-      
-      return { orderId: response.id };
-    } catch (error: any) {
-      console.error('Test order creation error:', error);
-      throw error;
-    }
-  }
 }
 
-export const backendPaymentService = new BackendPaymentService();
+export const paymentService = new PaymentService();

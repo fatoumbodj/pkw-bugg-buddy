@@ -1,6 +1,14 @@
-// Service d'authentification Backend Java
-import { apiClient, handleApiError } from './backendApi';
+// Service d'authentification Backend Spring Boot
+import { apiClient } from '../config/api-config';
 import { toast } from '@/hooks/use-toast';
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
 
 export interface LoginRequest {
   email: string;
@@ -17,32 +25,17 @@ export interface RegisterRequest {
 export interface AuthResponse {
   success: boolean;
   token: string;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-  };
+  user: User;
   message: string;
 }
 
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
-
-class BackendAuthService {
-  // Connexion utilisateur
+class AuthService {
+  // Connexion
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post('/auth/login', credentials, false);
+      const response = await apiClient.post<AuthResponse>('/auth/login', credentials, false);
       
       if (response.success && response.token) {
-        // Stocker le token JWT
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         
@@ -54,7 +47,6 @@ class BackendAuthService {
       
       return response;
     } catch (error: any) {
-      console.error('Login error:', error);
       toast({
         title: "Erreur de connexion",
         description: error.message || "Email ou mot de passe incorrect",
@@ -64,10 +56,10 @@ class BackendAuthService {
     }
   }
 
-  // Inscription utilisateur
+  // Inscription
   async register(userData: RegisterRequest): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post('/auth/register', userData, false);
+      const response = await apiClient.post<AuthResponse>('/auth/register', userData, false);
       
       if (response.success && response.token) {
         localStorage.setItem('token', response.token);
@@ -81,7 +73,6 @@ class BackendAuthService {
       
       return response;
     } catch (error: any) {
-      console.error('Register error:', error);
       toast({
         title: "Erreur d'inscription",
         description: error.message || "Impossible de créer le compte",
@@ -94,7 +85,11 @@ class BackendAuthService {
   // Mot de passe oublié
   async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await apiClient.post('/auth/forgot-password', { email }, false);
+      const response = await apiClient.post<{ success: boolean; message: string }>(
+        '/auth/forgot-password',
+        { email },
+        false
+      );
       
       toast({
         title: "Email envoyé",
@@ -103,7 +98,6 @@ class BackendAuthService {
       
       return response;
     } catch (error: any) {
-      console.error('Forgot password error:', error);
       toast({
         title: "Erreur",
         description: error.message || "Impossible d'envoyer l'email",
@@ -113,13 +107,14 @@ class BackendAuthService {
     }
   }
 
-  // Reset du mot de passe
+  // Reset mot de passe
   async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await apiClient.post('/auth/reset-password', { 
-        token, 
-        newPassword 
-      }, false);
+      const response = await apiClient.post<{ success: boolean; message: string }>(
+        '/auth/reset-password',
+        { token, newPassword },
+        false
+      );
       
       toast({
         title: "Mot de passe réinitialisé",
@@ -128,7 +123,6 @@ class BackendAuthService {
       
       return response;
     } catch (error: any) {
-      console.error('Reset password error:', error);
       toast({
         title: "Erreur",
         description: error.message || "Token invalide ou expiré",
@@ -138,16 +132,15 @@ class BackendAuthService {
     }
   }
 
-  // Vérifier le token JWT
+  // Vérifier le token
   async verifyToken(): Promise<User | null> {
     try {
       const token = localStorage.getItem('token');
       if (!token) return null;
 
-      const response = await apiClient.get('/auth/verify');
+      const response = await apiClient.get<{ user: User }>('/auth/verify');
       return response.user;
-    } catch (error: any) {
-      console.error('Token verification failed:', error);
+    } catch (error) {
       this.logout();
       return null;
     }
@@ -164,7 +157,7 @@ class BackendAuthService {
     });
   }
 
-  // Obtenir l'utilisateur actuel
+  // Utilisateur actuel
   getCurrentUser(): User | null {
     try {
       const userStr = localStorage.getItem('user');
@@ -174,16 +167,16 @@ class BackendAuthService {
     }
   }
 
-  // Vérifier si l'utilisateur est connecté
+  // Vérifier authentification
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
   }
 
-  // Vérifier si l'utilisateur est admin
+  // Vérifier rôle admin
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'ADMIN';
   }
 }
 
-export const backendAuthService = new BackendAuthService();
+export const authService = new AuthService();

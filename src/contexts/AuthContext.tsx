@@ -1,33 +1,33 @@
-// Context d'authentification Backend
+// Context d'authentification unifié
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { backendAuthService, User } from '@/lib/backendAuthApi';
+import { authService, User } from '@/api/services/auth.service';
 
-interface BackendAuthContextType {
+interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
 
-const BackendAuthContext = createContext<BackendAuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const useBackendAuth = () => {
-  const context = useContext(BackendAuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useBackendAuth must be used within a BackendAuthProvider');
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 };
 
-interface BackendAuthProviderProps {
+interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,11 +35,11 @@ export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ childr
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const currentUser = await backendAuthService.verifyToken();
+        const currentUser = await authService.verifyToken();
         setUser(currentUser);
       } catch (error) {
         console.error('Token verification failed:', error);
-        backendAuthService.logout();
+        authService.logout();
       } finally {
         setIsLoading(false);
       }
@@ -51,10 +51,14 @@ export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ childr
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await backendAuthService.login({ email, password });
+      const response = await authService.login({ email, password });
       if (response.success) {
         setUser(response.user);
+        return {};
       }
+      return { error: response.message };
+    } catch (error: any) {
+      return { error: error.message || 'Erreur de connexion' };
     } finally {
       setIsLoading(false);
     }
@@ -63,28 +67,27 @@ export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ childr
   const register = async (email: string, password: string, firstName: string, lastName: string) => {
     setIsLoading(true);
     try {
-      const response = await backendAuthService.register({ 
-        email, 
-        password, 
-        firstName, 
-        lastName 
-      });
+      const response = await authService.register({ email, password, firstName, lastName });
       if (response.success) {
         setUser(response.user);
+        return {};
       }
+      return { error: response.message };
+    } catch (error: any) {
+      return { error: error.message || "Erreur d'inscription" };
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
-    backendAuthService.logout();
+    authService.logout();
     setUser(null);
   };
 
   const refreshUser = async () => {
     try {
-      const currentUser = await backendAuthService.verifyToken();
+      const currentUser = await authService.verifyToken();
       setUser(currentUser);
     } catch (error) {
       console.error('Failed to refresh user:', error);
@@ -92,7 +95,7 @@ export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ childr
     }
   };
 
-  const value: BackendAuthContextType = {
+  const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'ADMIN',
@@ -104,8 +107,8 @@ export const BackendAuthProvider: React.FC<BackendAuthProviderProps> = ({ childr
   };
 
   return (
-    <BackendAuthContext.Provider value={value}>
+    <AuthContext.Provider value={value}>
       {children}
-    </BackendAuthContext.Provider>
+    </AuthContext.Provider>
   );
 };
