@@ -5,7 +5,7 @@ import QRCodeShowcase from '@/components/QRCodeShowcase';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useBackendAuth } from '@/context/BackendAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -17,7 +17,7 @@ import CreateBookSection from '@/components/CreateBookSection';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useBackendAuth();
+  const { isAuthenticated } = useAuth();
   const { t } = useLanguage();
   const [autoPlay, setAutoPlay] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -65,19 +65,8 @@ const Index = () => {
         <Hero />
            {/* QR Code Showcase - New section added between Hero and Features */}
         <QRCodeShowcase />
-          <CreateBookSection />
-        
-        <div className="text-center py-8">
-          <h3 className="text-2xl font-bold mb-4">Commencez maintenant</h3>
-          <p className="text-lg mb-6">Créez votre livre souvenir en quelques minutes</p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate('/whatsapp-book')}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            Créer mon livre WhatsApp
-          </Button>
-        </div>
+         {/* Section Créer mon livre - Nouvelle interface */}
+        <CreateBookSection />
         
         <Features />
         

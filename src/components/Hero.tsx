@@ -2,14 +2,14 @@
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import { useBackendAuth } from '@/context/BackendAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { BookOpen } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Hero = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { isAuthenticated } = useBackendAuth();
+  const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
 
   const handleCreateBookClick = () => {

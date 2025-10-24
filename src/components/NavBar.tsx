@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Menu, X, User, ShoppingBag, LogOut, ShoppingCart, Search, Settings } from 'lucide-react';
-import { useBackendAuth } from '@/context/BackendAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -22,7 +22,9 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, isAuthenticated, isAdmin, logout } = useBackendAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+    console.log("Etat Auth :", { isAuthenticated, user });
+
   const { items } = useCart();
   const itemsCount = items ? items.length : 0;
   const navigate = useNavigate();

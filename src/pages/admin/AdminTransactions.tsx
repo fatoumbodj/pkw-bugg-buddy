@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ interface Transaction {
 }
 
 const AdminTransactions = () => {
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -8,16 +8,16 @@ import { BookOpen, ShoppingBag, User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Dashboard = () => {
-  const { user, isAuthenticated, isLoading } = useBackendAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
   
   // Rediriger les administrateurs vers le tableau de bord d'administration
   useEffect(() => {
-    if (user?.role === 'ADMIN') {
+    if (isAdmin) {
       navigate('/admin');
     }
-  }, [user, navigate]);
+  }, [isAdmin, navigate]);
   
   const handleCreateBook = () => {
     navigate('/designer');
@@ -26,7 +26,7 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-ts-forest">
-        {t('dashboard.welcome')}, {user?.firstName || user?.email?.split('@')[0] || 'utilisateur'} !
+        {t('dashboard.welcome')}, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'utilisateur'} !
       </h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">

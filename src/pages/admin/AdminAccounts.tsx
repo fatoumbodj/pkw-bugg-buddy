@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,43 +11,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
 import { Plus, Edit, UserCog, Shield, Key } from "lucide-react";
+import { fetchAdmins, createAdmin, updateAdmin, Admin } from "@/hooks/useAdminService";
 
 const AdminAccounts = () => {
-  const [admins, setAdmins] = useState([
-    {
-      id: 1,
-      firstName: "Admin",
-      lastName: "Principal",
-      email: "admin@example.com",
-      role: "SUPER_ADMIN",
-      isActive: true,
-      createdAt: new Date("2023-01-01"),
-      lastLogin: new Date("2024-01-15")
-    },
-    {
-      id: 2,
-      firstName: "Sarah",
-      lastName: "Support",
-      email: "sarah@example.com",
-      role: "SUPPORT",
-      isActive: true,
-      createdAt: new Date("2023-06-15"),
-      lastLogin: new Date("2024-01-14")
-    },
-    {
-      id: 3,
-      firstName: "Michel",
-      lastName: "Manager",
-      email: "michel@example.com",
-      role: "MANAGER",
-      isActive: false,
-      createdAt: new Date("2023-03-10"),
-      lastLogin: new Date("2024-01-10")
-    }
-  ]);
+   const [admins, setAdmins] = useState<Admin[]>([]);
+  const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
 
-  const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
+   useEffect(() => {
+    const loadAdmins = async () => {
+      const data = await fetchAdmins();
+      setAdmins(data);
+    };
+    loadAdmins();
+  }, []);
 
+  
   const getRoleBadge = (role: string) => {
     const configs = {
       "SUPER_ADMIN": { label: "Super Admin", variant: "default" as const },
@@ -67,21 +45,16 @@ const AdminAccounts = () => {
     );
   };
 
-  const handleCreateAdmin = () => {
-    toast({
-      title: "Compte créé",
-      description: "Le nouveau compte administrateur a été créé avec succès."
-    });
+   const handleCreateAdmin = async (newAdmin: Partial<Admin>) => {
+    const created = await createAdmin(newAdmin);
+    if (created) setAdmins(prev => [...prev, created]);
   };
 
-  const handleUpdateAdmin = () => {
-    toast({
-      title: "Compte mis à jour",
-      description: "Les informations du compte ont été mises à jour."
-    });
-    setSelectedAdmin(null);
+  const handleUpdateAdmin = async (id: string, updatedAdmin: Partial<Admin>) => {
+    const updated = await updateAdmin(id, updatedAdmin);
+    if (updated) setAdmins(prev => prev.map(a => (a.id === id ? updated : a)));
   };
-
+  
   const permissions = {
     "SUPER_ADMIN": [
       "Accès complet au système",

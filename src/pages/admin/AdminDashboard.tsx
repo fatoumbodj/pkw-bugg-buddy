@@ -4,14 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { adminService, getStatusLabel } from '@/lib/adminServices';
-import { formatPrice } from '@/lib/backendServices';
-import { useBackendAuth } from '@/context/BackendAuthContext';
+import { formatPrice } from '@/lib/supabaseServices';
+import { useAuth } from '@/context/AuthContext';
 import { Navigate, Link } from 'react-router-dom';
 import { Loader2, ShoppingBag, Users, CreditCard, TrendingUp, Eye, Package } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 const AdminDashboard = () => {
-  const { isAuthenticated, isAdmin, isLoading: authLoading } = useBackendAuth();
+  const { isAuthenticated, isAdmin, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   
   const [stats, setStats] = useState({

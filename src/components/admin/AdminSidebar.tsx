@@ -33,7 +33,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface AdminSidebarProps {
   onLogout: () => Promise<void>;
@@ -41,7 +41,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onLogout }) => {
   const location = useLocation();
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   
   // Groupes de navigation
   const navigationGroups = [

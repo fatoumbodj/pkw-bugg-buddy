@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 
 const AdminSettings = () => {
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   
   // État pour les paramètres du site

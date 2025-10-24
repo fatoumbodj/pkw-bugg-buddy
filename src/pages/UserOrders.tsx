@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { orderApi } from "@/lib/orderApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import type { Order } from "@/types/order";
 
 const UserOrders = () => {
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);

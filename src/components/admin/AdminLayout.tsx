@@ -11,7 +11,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AdminSidebar from "./AdminSidebar";
 import { useState, useEffect } from "react";
@@ -19,7 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout } = useBackendAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);

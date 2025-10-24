@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ interface Partner {
 }
 
 const AdminPartners = () => {
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [partners, setPartners] = useState<Partner[]>([]);
   const [filteredPartners, setFilteredPartners] = useState<Partner[]>([]);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBackendAuth } from '@/context/BackendAuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Auth() {
-  const { login, register, isLoading } = useBackendAuth();
+  const { login, register, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('login');
@@ -41,7 +41,10 @@ export default function Auth() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(registerData.email, registerData.password, registerData.firstName, registerData.lastName);
+      await register(registerData.email, registerData.password, { 
+        firstName: registerData.firstName, 
+        lastName: registerData.lastName 
+      });
       navigate('/');
     } catch (error) {
       // Error is handled in AuthContext

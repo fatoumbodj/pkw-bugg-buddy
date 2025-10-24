@@ -19,11 +19,11 @@ export const PreviewTab = ({ onNext, onBack }: PreviewTabProps) => {
   const { bookDesign, updateDesign, messages, isPremiumUser } = useBookDesigner();
   
   const bookFormats = [
-    { id: "STANDARD", label: "Standard (15 x 21 cm)", price: "29.99€" },
-    { id: "LARGE", label: "Grand Format (21 x 29.7 cm)", price: "39.99€" },
-    { id: "POCKET", label: "Format Poche (10.5 x 17.5 cm)", price: "24.99€" },
-    { id: "SQUARE", label: "Format Carré (21 x 21 cm)", price: "34.99€" },
-    { id: "EBOOK", label: "eBook (Format numérique)", price: "14.99€" },
+    { id: "STANDARD", label: "Standard (15 x 21 cm)", price: "15 000 FCFA" },
+    { id: "LARGE", label: "Grand Format (21 x 29.7 cm)", price: "20 000 FCFA" },
+    { id: "POCKET", label: "Format Poche (10.5 x 17.5 cm)", price: "25 000 FCFA€" },
+    { id: "SQUARE", label: "Format Carré (21 x 21 cm)", price: "30 000 FCFA" },
+    { id: "EBOOK", label: "eBook (Format numérique)", price: "35 000 FCFA" },
   ];
   
   const handleViewBook = () => {

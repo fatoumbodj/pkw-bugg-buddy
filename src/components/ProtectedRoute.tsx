@@ -1,13 +1,13 @@
 
 import { Navigate } from "react-router-dom";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useBackendAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   // Afficher un loader pendant la vérification
   if (isLoading) {

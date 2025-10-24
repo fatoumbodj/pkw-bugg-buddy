@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useBackendAuth } from "@/context/BackendAuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import NavigationBackButton from "@/components/NavigationBackButton";
 import { useLanguage } from "@/context/LanguageContext";
 
 const AdminPayments = () => {
-  const { user } = useBackendAuth();
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<TransactionHistory[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<TransactionHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
